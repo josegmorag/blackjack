@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blackjack</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.14.0/css/all.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@900&display=swap" rel="stylesheet">
+    <script src="js/classes.js"></script>
+</head>
+<style>
+    * {
+    box-sizing: border-box;
+    }  
+  
+    body {
+      background-color:sienna;
+      display:flex;
+      justify-content: center;
+      align-items: center;
+      
+    }
+    
+    .header {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        align-items: center;
+        color:goldenrod;
+        font-size: 20px;
+        font-family: 'Noto Sans JP', sans-serif;
+        padding: 0;
+        margin: 0;
+        height: 65px;
+        
+    }
+    
+    .buttons {
+        display:flex;
+        flex-direction: row;
+        justify-content: space-around;
+        padding:0;
+        margin: 0;
+       
+    }
+
+    .button{
+        cursor: pointer;
+        border-radius: 50%;
+        font-size: 18px;
+        padding: 10px;
+        text-align: center;
+        font-family: "Lucida Console", monospace;
+        border: none;
+        outline: none;
+        color: white;
+        background-color: burlywood;
+    }
+
+    .button:hover{
+        background-color: goldenrod;
+        color:black;
+    }
+
+
+    canvas {
+     border-style: ridge; border-width: 15px; border-color: goldenrod;
+    }
+
+ 
+      
+    #gamearea{
+        padding-top: 20px;
+    }
+    
+    
+  </style>
+<body>
+    <div id="container">
+        <div class="header">
+            <h1>Blackjack</h1>
+        </div>
+        <div class="buttons">
+              <button id="deal" class="button">Deal</button>
+              <button id="hit" class="button">Hit</button>
+              <button id="stand" class="button">Stand</button>
+        </div>
+        <div id="gamearea"></div>
+    </div>
+    <script>
+        let score = 0;
+        let in_play = false;
+        let outcome = "";
+        let interval;
+        let deck;
+        let dealer;
+        let player;
+
+        let card_image = new Image();
+        let card_back = new Image();
+
+        card_image.src = "images/cards_jfitz.png";
+        card_back.src = "images/card_jfitz_back.png"
+
+        const SUITS = ['C', 'S', 'H', 'D'];
+        const RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K'];
+        const VALUES = {'A':1, '2':2, '3':3, '4':4, '5':5, '6':6, '7':7, '8':8, '9':9, 'T':10, 'J':10, 'Q':10, 'K':10};
+
+        const CARD_WIDTH = 72;
+        const CARD_HEIGHT = 96;
+
+        window.addEventListener("load", startGame,false);
+        document.getElementById("deal").addEventListener("click",deal,false);
+        document.getElementById("hit").addEventListener("click",hit,false);
+        document.getElementById("stand").addEventListener("click",stand,false);
+
+        function startGame() {
+           deal(); 
+           //frame = new simplegui(600,600);
+           frame = new simplegui(360,400);
+           frame.create();
+           frame.draw();
+          
+
+           interval= setInterval(() => {
+                 frame.draw();
+            }, 10);
+        }
+
+        function deal(){
+            if (!in_play){
+                in_play = true;
+                document.getElementById("hit").style.display = null; 
+                document.getElementById("stand").style.display = null;
+                document.getElementById("deal").style.display = "none";
+                outcome="";
+                deck = new Deck();
+                deck.shuffle();
+                player = new Hand();
+                dealer = new Hand();
+                hit();
+                hit();
+                
+                dealer.add_card(deck.deal_card());
+                dealer.add_card(deck.deal_card());
+              
+            } else {
+                score -=1;
+                outcome="La casa gana";
+                document.getElementById("hit").style.display = "none";
+                document.getElementById("stand").style.display = "none";
+                document.getElementById("deal").style.display = null;
+                in_play = false;
+            }
+        }
+
+        function hit(){
+            if (in_play){
+                player.add_card(deck.deal_card());
+
+                if (player.get_value() > 21){
+                    in_play = false;
+                    document.getElementById("hit").style.display = "none";
+                    document.getElementById("stand").style.display = "none";
+                    document.getElementById("deal").style.display = null;
+                    outcome = "Te fuiste y perdiste" 
+                    score -=1 
+                }
+            }
+        }
+
+        function stand(){
+            if (in_play){
+                while (dealer.get_value() < 17){
+                   dealer.add_card(deck.deal_card());
+                }
+
+                if (dealer.get_value() > 21 || dealer.get_value() < player.get_value()){
+                    if (dealer.get_value() > 21){
+                        outcome = "Me fui y perdi"
+                    }else{
+                        outcome ="Ganaste"
+                    }
+
+                    score +=1 
+                }
+                else{
+                    outcome = "Perdiste";
+                    score -=1
+                }
+
+                in_play=false;  
+                document.getElementById("hit").style.display = "none"; 
+                document.getElementById("stand").style.display = "none";
+                document.getElementById("deal").style.display = null;
+            }
+        }
+        
+    </script>
+    
+</body>
+</html>
