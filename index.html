@@ -164,7 +164,7 @@
                     document.getElementById("hit").style.display = "none";
                     document.getElementById("stand").style.display = "none";
                     document.getElementById("deal").style.display = null;
-                    outcome = "Te fuiste y perdiste" 
+                    outcome = "You Lost" 
                     score -=1 
                 }
             }
@@ -178,15 +178,15 @@
 
                 if (dealer.get_value() > 21 || dealer.get_value() < player.get_value()){
                     if (dealer.get_value() > 21){
-                        outcome = "Me fui y perdi"
+                        outcome = "I Lost"
                     }else{
-                        outcome ="Ganaste"
+                        outcome ="You Win"
                     }
 
                     score +=1 
                 }
                 else{
-                    outcome = "Perdiste";
+                    outcome = "You Lost";
                     score -=1
                 }
 
